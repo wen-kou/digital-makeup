@@ -10,9 +10,10 @@ pool = ThreadPool(1024)
 
 
 def draw_landmark(face_img, landmark_list):
+    res = face_img
     for landmark in landmark_list:
-        cv2.circle(face_img, (int(landmark[0]),int(landmark[1])), 3, (0, 255, 255), thickness=False)
-    return face_img
+        cv2.circle(res, (int(landmark[0]),int(landmark[1])), 3, (0, 255, 255), thickness=-1)
+    return res
 
 
 def find_face_region(landmark_list_for_one_region, image_size):
@@ -27,32 +28,35 @@ def find_face_region(landmark_list_for_one_region, image_size):
     return np.where(mask == 255)[0:2]
 
 
-def get_triangle_landmarks(landmark_dict):
-    landmark_coord = []
-    for key, value in landmark_dict.items():
-        landmark_coord.extend(value)
-    #
-    # for i, value in enumerate(landmark_coord):
-    #     landmark_coord[i] = tuple([value[1], value[0]])
-
+def get_triangle_landmarks(landmarks):
+    if isinstance(landmarks, dict):
+        landmark_coord = []
+        for key, value in landmarks.items():
+            landmark_coord.extend(value)
+    landmark_coord = landmarks
     triangles = Delaunay(landmark_coord)
+    return landmark_coord, triangles.simplices, get_triangle_mesh(landmark_coord, triangles.simplices)
 
-    return landmark_coord, triangles.simplices
+
+def get_triangle_mesh(coords, triangles_indices):
+    return list(map(lambda tri_index: [coords[tri_index[0]],
+                                       coords[tri_index[1]],
+                                       coords[tri_index[2]]], triangles_indices))
 
 
-def calc_triangle_affine_transformation(ptSource, ptTarget):
-    ptSource = np.asarray(ptSource)
+def calc_triangle_affine_transformation(pts_source, pts_target):
+    pts_source = np.asarray(pts_source)
     ones = np.ones((3, 1))
-    ptSource = np.hstack((ptSource, ones)).transpose()
+    pts_source = np.hstack((pts_source, ones)).transpose()
 
-    ptTarget = np.asarray(ptTarget)
-    ptTarget = np.hstack((ptTarget, ones)).transpose()
+    pts_target = np.asarray(pts_target)
+    pts_target = np.hstack((pts_target, ones)).transpose()
 
     try:
-        affine_transformation = np.matmul(ptTarget, inv(ptSource))
+        affine_transformation = np.matmul(pts_target, inv(pts_source))
     except:
         affine_transformation = None
-        print("Input source points {} is in the same line".format(ptSource))
+        print("Input source points at least two {} are in the same point".format(pts_source))
 
     return affine_transformation
 
@@ -72,9 +76,10 @@ def pixel_transfer(affine_trans, source_pixels):
     output = np.matmul(affine_trans, input)
 
     scalar = np.repeat(output[2,:], 3, axis=0)
+    scalar = np.reshape(scalar, output.shape)
     output = np.divide(output, scalar)
 
-    return output
+    return output[0:2,:]
 
 
 def _triangle_pixels_warp(ptSource, sourceImgSize, ptTarget):
