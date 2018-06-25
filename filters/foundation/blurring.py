@@ -9,22 +9,7 @@ import numpy as np
 # from os.path import isfile, join
 # from skimage import io
 from cv2.ximgproc import guidedFilter as gf
-
-
-# def readImg(file_name):
-#     # Read in image as np array and split RGB channels since cv2 use BGR rather than RGB and TROUBLESOME
-#     image = cv2.imread(file_name)
-#     b, g, r = cv2.split(image)
-#     return image, r, g, b
-
-
-# def closeWind():
-#     cv2.waitKey(0)
-#     cv2.destroyAllWindows()
-#     cv2.waitKey(5)
-
-def imageBlending(origin, destin, percentage):
-    return cv2.addWeighted(origin, 1 - percentage, destin, percentage, 0.0)
+from utils import img_randering
 
 
 def detectSkin(img):
@@ -45,7 +30,6 @@ def detectSkin(img):
             if criteria1 or criteria2:
                 img_skin[row, col] = (1, 1, 1)
 
-
     return img_skin
 
 
@@ -55,7 +39,6 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
 
     if strength == 0:
         return img
-
     '''
     操作思路：
     1. 对原图层image进行双边滤波，结果存入temp1图层中。
@@ -81,16 +64,16 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
     temp2 = (temp1 - img + 128).astype(np.uint8)  # High Freq: Noise and Details => To be Reduced
     temp3 = blurFunc.get(func, lambda: None)()  # Blurring the High Freq
     temp4 = temp1 + temp3 - 135
-    # Because delta = low - origin + 128 => new = low + delta - 128
+    # Because delta = low - origin + 128 => new = low + delta - 128 (+- epsilon)
 
     dst = np.uint8(img * ((100 - p) / 100) + temp4 * (p / 100))
     imgskin_c = np.uint8(-(imgSkin - 1))
     dst = np.uint8(dst * imgSkin + img * imgskin_c)
 
-    blended = imageBlending(img, dst, strength / 100)
+    blended = img_randering.imageBlending(img, dst, strength / 100)
     return blended
 
-# img, r, g, b = readImg('face3.jpg')
+# img, r, g, b = readImg('test_face3.jpg')
 # filterName = "Gaussian"
 # result = dermabrasion(img, detect_skin(img), filterName, value1=3, value2=2)
 # showNclose(result, filterName)
