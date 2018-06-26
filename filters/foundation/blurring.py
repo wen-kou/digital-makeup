@@ -2,17 +2,11 @@
 
 import cv2
 import numpy as np
-# import os
-# from os import listdir
-# from matplotlib import pyplot as plt
-# import pandas as pd
-# from os.path import isfile, join
-# from skimage import io
 from cv2.ximgproc import guidedFilter as gf
 from utils import img_randering
 
 
-def detectSkin(img):
+def detectSkin(img):  # Depreciated and Disabled
     rows, cols, channals = img.shape
     img_skin = np.zeros((rows, cols, channals), np.uint8)
     for row in range(rows):
@@ -25,12 +19,27 @@ def detectSkin(img):
                     max(red, green, blue) - min(red, green, blue) > 15) and abs(red - green) > 15 and (
                                 red > green) and (red > blue)
             criteria2 = (red > 220) and (green > 210) and (blue > 170) and (abs(red - green) <= 15) and (
-                        red > blue) and (green > blue)
+                    red > blue) and (green > blue)
 
-            if criteria1 or criteria2:
+            # if criteria1 or criteria2:
+            if True:
                 img_skin[row, col] = (1, 1, 1)
 
     return img_skin
+
+
+def linearLight(img_1, img_2):
+    img_1 = img_1 / 255
+    img_2 = img_2 / 255
+
+    img = np.array(img_2 + img_1 * 2 - 1)
+    mask_1 = img < 0
+    mask_2 = img > 1
+    img = img * (1 - mask_1)
+    img = img * (1 - mask_2) + mask_2
+
+    img *= 255
+    return img.astype(np.uint8)
 
 
 def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
@@ -63,7 +72,7 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
     temp1 = cv2.bilateralFilter(img, dx, fc, fc)  # Low Freq: Blurred
     temp2 = (temp1 - img + 128).astype(np.uint8)  # High Freq: Noise and Details => To be Reduced
     temp3 = blurFunc.get(func, lambda: None)()  # Blurring the High Freq
-    temp4 = temp1 + temp3 - 135
+    temp4 = linearLight(temp1, temp3)
     # Because delta = low - origin + 128 => new = low + delta - 128 (+- epsilon)
 
     dst = np.uint8(img * ((100 - p) / 100) + temp4 * (p / 100))
@@ -72,8 +81,3 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
 
     blended = img_randering.imageBlending(img, dst, strength / 100)
     return blended
-
-# img, r, g, b = readImg('test_face3.jpg')
-# filterName = "Gaussian"
-# result = dermabrasion(img, detect_skin(img), filterName, value1=3, value2=2)
-# showNclose(result, filterName)

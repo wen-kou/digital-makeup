@@ -2,10 +2,10 @@
 
 import cv2
 import numpy as np
-from utils import img_randering
+# from utils import img_randering
 
 
-def whitenSkin(img, imgSkin, s_rate = 0.22, v_rate = 0.17):
+def whitenSkin(img, s_rate = 0.22, v_rate = 0.17):
     '''
     提亮美白
     arguments:
@@ -17,13 +17,12 @@ def whitenSkin(img, imgSkin, s_rate = 0.22, v_rate = 0.17):
 
     # S: Saturation: the larger the more "colorful": DECREASE
     img_hsv[:, :, 1] = \
-        np.minimum(img_hsv[:, :, 1] - img_hsv[:, :, 1] * imgSkin[:, :, 1] * s_rate, 255).astype('uint8')
+        np.minimum(img_hsv[:, :, 1] - img_hsv[:, :, 1]  * s_rate, 255).astype('uint8')
 
     # V: Value: the larger the lighter: INCREASE
     img_hsv[:, :, 2] = \
-        np.minimum(img_hsv[:, :, 2] + img_hsv[:, :, 2] * imgSkin[:, :, 2] * v_rate, 255).astype('uint8')
+        np.minimum(img_hsv[:, :, 2] + img_hsv[:, :, 2]  * v_rate, 255).astype('uint8')
 
-    img_hsv = img_randering.trim256(img_hsv)
     return cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
 
 
@@ -70,4 +69,4 @@ def kelvin2BGR(kTemp):  # kTemp in [1000,40000]
 
 def colorBalance(img, kTemp):
     clr = kelvin2BGR(kTemp)
-    return (img_randering.trim256(img * clr / 255)).astype(np.uint8)
+    return (img * clr / 255).astype(np.uint8)

@@ -19,6 +19,7 @@ class TestFoundation(TestCase):
         import_path = '../assets/natural_look/'
         tmp_list = listdir_nohidden(import_path)
         # tmp_list = ["test_face3.jpg"]
+        # tmp_list = ["test_34756300_176754833015550_7307187577633636352_n.jpg"]
         for img_name in tmp_list:
             img_path = import_path + img_name
             img = cv2.imread(img_path)
@@ -27,14 +28,14 @@ class TestFoundation(TestCase):
             # Gaussian, Guided, Surface, Bilateral
             for filter_name in ["Gaussian", "Guided", "Surface", "Bilateral"]:
                 start = time.clock()
-                blur_result = blurring.skinRetouch(img, img_skin, filter_name, strength=100)
-                white_result = whitening.whitenSkin(blur_result, img_skin)
-                blend_result = img_randering.imageBlending(blur_result, white_result, 0.8)
+                white_result = whitening.whitenSkin(img)
+                blur_result = blurring.skinRetouch(white_result, img_skin, filter_name, strength=100)
+                blend_result = img_randering.imageBlending(blur_result, white_result, 0.5)
 
                 end1 = time.clock()-start
                 print("Foundation Time:", img_name, filter_name, end1)
 
-                export_path = './result/' + img_name[:-4] + '/'
+                export_path = './result-White_First/' + img_name[:-4] + '/'
                 save_name = filter_name + '-' + img_name
                 if not os.path.exists(export_path):
                     os.makedirs(export_path)
