@@ -35,7 +35,7 @@ class TestFoundation(TestCase):
                 end1 = time.clock()-start
                 print("Foundation Time:", img_name, filter_name, end1)
 
-                export_path = './result-White_First-1/' + img_name[:-4] + '/'
+                export_path = './test_result-White_First-1/' + img_name[:-4] + '/'
                 save_name = filter_name + '-' + img_name
                 if not os.path.exists(export_path):
                     os.makedirs(export_path)

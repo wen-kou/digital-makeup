@@ -9,14 +9,14 @@ from utils import face_process
 def _get_facial_feature_landmarks(landmark_mode=68):
     feature_index_dict = {}
     if landmark_mode == 68:
-        left_eye_area_index = [int(0)]
-        left_eye_area_index.extend(np.arange(17, 22).tolist())
-        left_eye_area_index.extend(np.arange(36, 42).tolist())
-        feature_index_dict.update({'left_eye_area': left_eye_area_index})
+        left_eye_area_index = np.arange(0, 6)
+        left_eye_area_index = np.hstack((left_eye_area_index, np.arange(17, 22)))
+        left_eye_area_index = np.hstack((left_eye_area_index, np.arange(36, 42)))
+        feature_index_dict.update({'left_eye_area': left_eye_area_index.tolist()})
 
-        right_eye_area_index = [int(16)]
-        right_eye_area_index.extend(np.arange(22, 27).tolist())
-        right_eye_area_index.extend(np.arange(42, 48).tolist())
+        right_eye_area_index = np.arange(11, 17)
+        right_eye_area_index = np.hstack((right_eye_area_index, np.arange(22, 27)))
+        right_eye_area_index = np.hstack((right_eye_area_index, np.arange(42, 48)))
         feature_index_dict.update({'right_eye_area': right_eye_area_index})
 
         up_lip_index = np.arange(48, 55)
@@ -101,6 +101,9 @@ def makeup_by_facial_feature(target_image, example_image):
                                                                 target_image.shape, example_triangle_mesh)
     alpha_map, _ = face_process.get_new_face_mask(example_image)
     fusion_image = \
-        makeup_transfer_by_example.color_blending(target_image, target_pts, example_image, example_pts, alpha_map=alpha_map)
+        makeup_transfer_by_example.color_blending(target_image,
+                                                  target_pts,
+                                                  example_image,
+                                                  example_pts, alpha_map=alpha_map)
 
     return fusion_image
