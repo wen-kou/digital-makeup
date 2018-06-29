@@ -61,7 +61,7 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
     fc = 40  # delta value for the filter
     p = 50  # transparency
     blurFunc = {
-        "Gaussian": lambda: cv2.GaussianBlur(temp2, (5, 5), 0, 0),
+        "Gaussian": lambda: cv2.GaussianBlur(temp2, (21, 21), 0, 0),
         # guidedFilter(guide, src, radius, eps[, dst[, dDepth]])
         "Guided": lambda: gf(temp2, temp2, 10, 10),
 
@@ -76,8 +76,27 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
     # Because delta = low - origin + 128 => new = low + delta - 128 (+- epsilon)
 
     dst = np.uint8(img * ((100 - p) / 100) + temp4 * (p / 100))
-    imgskin_c = np.uint8(-(imgSkin - 1))
-    dst = np.uint8(dst * imgSkin + img * imgskin_c)
 
-    blended = img_randering.imageBlending(img, dst, strength / 100)
+    # dst_blend = np.uint8(dst * imgSkin + img * imgskin_c)
+    #
+    # dst_blurred = cv2.blur(dst_blend, (5, 5))
+    # dilate_imgSkin = np.uint8(cv2.dilate(np.uint(imgSkin), (11,11)))
+    # dilate_dst = dilate_imgSkin*dst_blurred
+    # dilate_dst = dst * imgSkin + dilate_dst * imgskin_c
+    # dilate_imgskin_c = np.uint8(-(dilate_imgSkin - 1))
+    #
+    # dst_result = dilate_dst * dilate_imgSkin + img * dilate_imgskin_c
+
+    #
+    # imgskin_c = np.uint8(-(imgSkin - 1))
+    # # blurred_dst = cv2.blur(dst * imgSkin, (11,11))
+    blurred_mask = cv2.blur(imgSkin*255,(51,51))/255
+    blurred_mask[:,:,1]=blurred_mask[:,:,0]
+    blurred_mask[:, :, 2]=blurred_mask[:,:,0]
+    # # dst_result = np.uint8(blurred_dst/imgSkin)
+    imgskin_c = -(blurred_mask - 1)
+
+    dst_blend = np.uint8(dst * blurred_mask + img * imgskin_c)
+
+    blended = img_randering.imageBlending(img, dst_blend, strength / 100)
     return blended

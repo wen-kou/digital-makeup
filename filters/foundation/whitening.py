@@ -12,7 +12,7 @@ def whitenSkin(img, s_rate = 0.22, v_rate = 0.17):
     rate:float,-1~1,new_V=min(255,V*(1+rate))
     confirm:whether confirm this option
     '''
-
+    # img = colorBalance(img, 10000)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # S: Saturation: the larger the more "colorful": DECREASE
@@ -23,7 +23,10 @@ def whitenSkin(img, s_rate = 0.22, v_rate = 0.17):
     img_hsv[:, :, 2] = \
         np.minimum(img_hsv[:, :, 2] + img_hsv[:, :, 2]  * v_rate, 255).astype('uint8')
 
-    return cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
+    # Adjust Color Temperature
+    img_bgr = cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
+
+    return img_bgr
 
 
 def kelvin2BGR(kTemp):  # kTemp in [1000,40000]
