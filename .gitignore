@@ -37,9 +37,5 @@ www-test/
 .DS_Store
 
 # test output
-blending_result.jpg
-test1.jpg
-facial_landmarks.jpg
-face.jpg
-facial_feature_makeup.jpg
-facial_features.jpg
+test*.jpg
+test_*/
