@@ -2,8 +2,8 @@ import unittest
 import cv2
 
 from blending import makeup_transfer_by_example
-from factial_attributes.facial_segment import face_segmentation
-from factial_attributes.facial_landmarks import facial_landmarks_detection_dlib
+from facial_attributes.facial_segment import face_segmentation
+from facial_attributes.facial_landmarks import facial_landmarks_detection_dlib
 
 
 class MyTestCase(unittest.TestCase):

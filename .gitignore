@@ -39,3 +39,4 @@ www-test/
 # test output
 test*.jpg
 test_*/
+__pycache__

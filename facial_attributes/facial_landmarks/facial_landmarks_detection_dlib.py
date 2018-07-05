@@ -2,7 +2,7 @@ import dlib
 
 from utils import face_process
 
-predictor_path = '../../resources/shape_predictor_68_face_landmarks.dat'
+predictor_path = '../resources/shape_predictor_68_face_landmarks.dat'
 face_shape_predictor = dlib.shape_predictor(predictor_path)
 
 

@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 
 from pipelines import makeup_by_facial_features
-from factial_attributes.facial_segment import face_segmentation
-from factial_attributes.facial_landmarks import facial_landmarks_detection_dlib
+from facial_attributes.facial_segment import face_segmentation
+from facial_attributes.facial_landmarks import facial_landmarks_detection_dlib
 
 class MyTestCase(unittest.TestCase):
     def test_facial_features(self):
