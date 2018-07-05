@@ -5,7 +5,7 @@ import numpy as np
 
 from scipy.linalg import inv
 from utils import knn_matte
-from factial_attributes.facial_landmarks import facial_landmarks_detection_dlib
+from facial_attributes.facial_landmarks import facial_landmarks_detection_dlib
 
 global detector
 detector = dlib.get_frontal_face_detector()

@@ -4,8 +4,8 @@ import numpy as np
 
 from face_recognition import face_landmarks
 
-from factial_attributes.facial_landmarks import facial_landmarks_detection_dlib
-from factial_attributes.facial_segment import face_segmentation
+from facial_attributes.facial_landmarks import facial_landmarks_detection_dlib
+from facial_attributes.facial_segment import face_segmentation
 
 
 class MyTestCase(unittest.TestCase):
