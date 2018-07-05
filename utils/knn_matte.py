@@ -46,7 +46,7 @@ def knn_matte(img, trimap, mylambda=100):
     return alpha
 
 
-def get_trimap(input_img, landmarks_list):
+def get_trimap(input_img, landmarks_list, kernel=None, skip_cut=True):
     landmarks_list = np.asarray(landmarks_list)
     x_min, y_min = np.min(landmarks_list, axis=0)
     x_max, y_max = np.max(landmarks_list, axis=0)
@@ -56,13 +56,52 @@ def get_trimap(input_img, landmarks_list):
     seg_img = input_img[top_left[1]: bottom_right[1], top_left[0]: bottom_right[0]]
     trimap = np.zeros(input_img.shape)
     cv2.fillPoly(trimap, [landmarks_list], (255,255,255))
-    trimap = trimap[top_left[1]: bottom_right[1], top_left[0]: bottom_right[0]]
-    size = int(0.3 * height)
-    kernel = np.ones((size,size))
+
+    if kernel is None:
+        size = int(0.3 * height)
+        kernel = np.ones((size, size))
     foreground = cv2.erode(trimap, kernel, iterations=1)
     background = cv2.dilate(trimap, kernel, iterations=1)
     tmp = foreground - background
     ind = np.where(tmp<0)
     trimap[ind[0], ind[1], ind[2]] = 126
-    return seg_img, trimap, {'top_left': top_left, 'bottom_right': bottom_right}
+    if skip_cut is True:
+        return input_img, \
+               trimap, \
+               {'top_left': tuple([0,0]), 'bottom_right': tuple([input_img.shape[1], input_img.shape[0]])}
+    else:
+        trimap = trimap[top_left[1]: bottom_right[1], top_left[0]: bottom_right[0]]
+        return seg_img, trimap, {'top_left': top_left, 'bottom_right': bottom_right}
+
+
+def get_face_trimap(image, facial_contour_landmarks, kernel=None):
+    trimap = 126 * np.ones(image.shape)
+
+    trimap = cv2.fillPoly(trimap, [np.asarray(facial_contour_landmarks)], (255, 255, 255))
+
+    x_min, y_min = np.min(facial_contour_landmarks, axis=0)
+    x_max, y_max = np.max(facial_contour_landmarks, axis=0)
+    height = y_max - y_min
+    if kernel is None:
+        size = int(0.3 * height)
+        kernel = np.ones((size, size))
+    trimap = cv2.erode(trimap, kernel, iterations=1)
+    y_min = int(y_min - 1.1 * height/3)
+    if y_min<0:
+        y_min = 0
+
+    trimap[0:y_min+1, :] = (0, 0, 0)
+    trimap[:, 0:int(x_min/2)] = (0, 0, 0)
+    y_max = int(y_max + 0.5 * (image.shape[0] - y_max))
+    if y_max > image.shape[0] - 1:
+        y_max = int(image.shape[0] - 1)
+    trimap[y_max:image.shape[0], :] = (0, 0, 0)
+    x_max = int(x_max + 0.5*(image.shape[1] - x_max))
+    if x_max > image.shape[1]-1:
+        x_max = image.shape[1]-1
+    trimap[:, x_max:image.shape[1]] = (0,0,0)
+    return trimap
+
+
+
 

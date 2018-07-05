@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import copy
 
 from multiprocessing.pool import ThreadPool
 
@@ -39,7 +40,7 @@ def makeup_transfer(target_image,
     return np.asarray(target_color, dtype=np.uint8)
 
 
-def color_blending(target_image,
+def color_blending(target_image_origin,
                    target_pixels,
                    ref_image,
                    transfer_pixels,
@@ -52,7 +53,7 @@ def color_blending(target_image,
         alpha_map = np.repeat(alpha_map, 3, axis=1)
         alpha_map = np.reshape(alpha_map, ref_image_size)
         ref_image = np.multiply(ref_image, alpha_map)
-
+    target_image = copy.copy(target_image_origin)
     target_pixels = np.asarray(target_pixels, dtype=int).transpose()
     origin_color_values = target_image[target_pixels[0], target_pixels[1]]
     transfer_pixels = np.asarray(transfer_pixels)
