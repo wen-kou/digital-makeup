@@ -42,7 +42,7 @@ def linearLight(img_1, img_2):
     return img.astype(np.uint8)
 
 
-def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
+def skinRetouch(img, imgSkin, func="Gaussian", strength=50, dx = 10):
     strength = min(strength, 100)
     strength = max(strength, 0)
 
@@ -57,7 +57,7 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50):
     5. 考虑不透明度，修正上一步的结果，得到最终图像dst。
     '''
 
-    dx = 10  # kernel size of the filter
+    # dx = 10  # kernel size of the filter
     fc = 40  # delta value for the filter
     p = 50  # transparency
     blurFunc = {
