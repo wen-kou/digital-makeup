@@ -25,7 +25,7 @@ class TestFoundation(TestCase):
             img_path = import_path + img_name
             img = cv2.imread(img_path)
 
-            cheek_mask = facemask.get_cheek_forehead_mask(img) # This is the acne mask: circle out the acne
+            cheek_mask = facemask.get_cheek_forehead_acne_mask(img) # This is the acne mask: circle out the acne
             if len(cheek_mask.shape) == 3:
                 cheek_mask = cheek_mask[:, :, 0]
 

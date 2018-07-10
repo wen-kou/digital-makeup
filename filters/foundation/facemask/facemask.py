@@ -185,7 +185,7 @@ def update_face_mask(new_mask, whole_img_mask):
     return np.clip(new_mask + whole_img_mask, 0, 1)
 
 
-def get_cheek_forehead_mask(img):
+def get_cheek_forehead_acne_mask(img):
     faces = _get_faces(img)
     if not type(faces[0]) is Face:
         return np.zeros(img.shape, dtype=np.uint8)
