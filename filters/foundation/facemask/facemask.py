@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import dlib
 from filters.foundation.facemask import constants
+from filters.de_acne import acne_mask as am
 
 
 class Face:
@@ -113,6 +114,19 @@ class Organ:
         return mask
 
 
+def _get_faces(img):
+    all_face_landmark = _get_all_face_landmark(img)
+    if not all_face_landmark:  # If no face detected
+        print("NOT FOUND")
+        return [np.zeros(img.shape, dtype=np.uint8) + 1]
+
+    faces = []
+    for tmp_landmark in all_face_landmark:
+        faces.append(Face(img, tmp_landmark))
+
+    return faces
+
+
 def get_img_face_mask(img):
     '''
      1. Scan through the image and find all the faces inside;
@@ -123,16 +137,13 @@ def get_img_face_mask(img):
         3.3. Draw the forehead mask
         3.4. Combine the forehead mask and the lower mask
     '''
-    all_face_landmark = _get_all_face_landmark(img)
-    if not all_face_landmark:  # If no face detected
-        print("NOT FOUND")
-        return np.zeros(img.shape, dtype=np.uint8) + 1
 
-    faces = []
-    for tmp_landmark in all_face_landmark:
-        faces.append(Face(img, tmp_landmark))
+    faces = _get_faces(img)
 
     whole_img_mask = np.zeros(img.shape, dtype=np.uint8)
+    if not type(faces[0]) is Face:
+        return whole_img_mask
+
     for face in faces:
         mask = get_one_face_mask(face)
         whole_img_mask = update_face_mask(mask, whole_img_mask)
@@ -172,3 +183,37 @@ def get_dig_out_organs(face):
 
 def update_face_mask(new_mask, whole_img_mask):
     return np.clip(new_mask + whole_img_mask, 0, 1)
+
+
+def get_cheek_forehead_mask(img):
+    faces = _get_faces(img)
+    if not type(faces[0]) is Face:
+        return np.zeros(img.shape, dtype=np.uint8)
+    masks = []
+
+    for face in faces:
+        # choice: LEFT_CHEEK, RIGHT_CHEEK, FOREHEAD
+        for choice in [0, 1, 2]:
+        # for choice in [1]:
+            if choice == constants.LEFT_CHEEK:
+                partial_landmark = face.landmark[constants.LEFT_CHEEK_POINTS]
+
+            elif choice == constants.RIGHT_CHEEK:
+                partial_landmark = face.landmark[constants.RIGHT_CHEEK_POINTS]
+
+            else:
+                face.mask = np.zeros(face.img.shape, dtype=np.uint8)
+                face.get_forehead_landmark()
+                partial_landmark = face.organs[-1].landmark
+
+            mask = np.zeros(img.shape[:-1], dtype=np.uint8)
+            points = np.array([[i] for i in partial_landmark.tolist()])
+            mask = cv2.fillConvexPoly(mask, points, color=1).astype(np.uint8)
+            mask = np.array([mask, mask, mask]).transpose((1, 2, 0))
+
+            mask = am.get_acne_mask_on_patch(img, mask)
+            masks.append(mask)
+            masks.append(mask)
+
+    return np.clip(sum(masks), 0, 1)
+

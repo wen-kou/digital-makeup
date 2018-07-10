@@ -3,7 +3,7 @@
 import cv2
 import numpy as np
 from cv2.ximgproc import guidedFilter as gf
-from utils import img_randering
+from utils import img_rendering
 
 
 def detectSkin(img):  # Depreciated and Disabled
@@ -98,5 +98,5 @@ def skinRetouch(img, imgSkin, func="Gaussian", strength=50, dx = 10):
 
     dst_blend = np.uint8(dst * blurred_mask + img * imgskin_c)
 
-    blended = img_randering.imageBlending(img, dst_blend, strength / 100)
+    blended = img_rendering.imageBlending(img, dst_blend, strength / 100)
     return blended

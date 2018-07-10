@@ -1,7 +1,7 @@
 from filters.foundation import blurring
 from filters.foundation import whitening
 from filters.foundation.facemask import facemask
-from utils import img_randering
+from utils import img_rendering
 import cv2
 import os
 import unittest
@@ -36,7 +36,7 @@ class TestFoundation(TestCase):
                 white_result = whitening.whitenSkin(img)
                 blur_result = blurring.skinRetouch(white_result, img_skin, filter_name, strength=80, dx=30)
                 # white_result2 = whitening.whitenSkin(blur_result)
-                blend_result = img_randering.imageBlending(blur_result, white_result, 0.7)
+                blend_result = img_rendering.imageBlending(blur_result, white_result, 0.7)
                 blend_result = whitening.colorBalance(blend_result, 10000)
 
                 end1 = time.clock()-start
