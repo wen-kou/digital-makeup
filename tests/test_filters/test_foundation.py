@@ -42,11 +42,9 @@ class TestFoundation(TestCase):
                 end1 = time.clock()-start
                 print("Foundation Time:", img_name, filter_name, end1)
 
-
                 # export_path = './result-White_First-0629-4.4/' + img_name[:-4] + '/'
                 export_path = './result-White_First-0629-4.6/'
                 save_name = img_name[:-4] + filter_name + '.jpg'
-
                 if not os.path.exists(export_path):
                     os.makedirs(export_path)
                 cv2.imwrite(export_path + save_name, blend_result)
