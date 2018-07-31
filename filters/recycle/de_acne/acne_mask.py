@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
-from utils import img_rendering as render
-from filters.foundation.facemask import facemask
+from filters import render_util as render
 
 
 def tri_color(gray):
@@ -18,9 +17,9 @@ def tri_color(gray):
 def get_acne_mask_on_patch(img, in_mask):
     img = img*in_mask
     g = cv2.split(img)[1]
-    hard_g = render.Hard_light(g, g)
-    hard_g2 = render.Hard_light(hard_g, hard_g)
-    hard_g3 = render.Hard_light(hard_g2, hard_g2)
+    hard_g = render.hard_light(g, g)
+    hard_g2 = render.hard_light(hard_g, hard_g)
+    hard_g3 = render.hard_light(hard_g2, hard_g2)
     tri_hg3 = tri_color(hard_g3)
 
     params = cv2.SimpleBlobDetector_Params()

@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 import dlib
-from filters.foundation.facemask import constants
-from filters.de_acne import acne_mask as am
+from filters.facemask import constants
+from filters.recycle.de_acne import acne_mask as am
 
 
 class Face:
@@ -164,7 +164,7 @@ def get_one_face_mask(face):
     whole_face_mask = whole_face_mask - face.mask
     return whole_face_mask
 
-
+# Copied
 def _get_all_face_landmark(img):  # Will detect and return ALL faces in the image
     predictor_path = '../../resources/shape_predictor_68_face_landmarks.dat'
     detector = dlib.get_frontal_face_detector()
@@ -212,7 +212,6 @@ def get_cheek_forehead_acne_mask(img):
             mask = np.array([mask, mask, mask]).transpose((1, 2, 0))
 
             mask = am.get_acne_mask_on_patch(img, mask)
-            masks.append(mask)
             masks.append(mask)
 
     return np.clip(sum(masks), 0, 1)

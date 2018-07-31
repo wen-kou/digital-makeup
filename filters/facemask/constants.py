@@ -1,9 +1,20 @@
+# July/2018 LzCai
+
 import numpy as np
 
 ORGAN_NAME = ['jaw', 'mouth', 'nose', 'left eye', 'right eye', 'left brow', 'right brow']
 ORGAN_INDEX = [list(range(0, 17)), list(range(48, 61)), list(range(27, 35)), list(range(42, 48)),
                list(range(36, 42)), list(range(22, 27)), list(range(17, 22))]
 ORGAN_DETECT_LIST = [1, 3, 4, 5, 6]
+
+JAW = 0
+MOUTH = 1
+NOSE = 2
+LEFT_EYE = 3
+RIGHT_EYE = 4
+LEFT_BROW = 5
+RIGHT_BROW = 6
+FOREHEAD = 7
 
 def get_checklist():
     point_checklist = [""] * 68
